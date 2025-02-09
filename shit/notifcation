@@ -7,9 +7,8 @@ screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 -- Table to store active notifications
 local activeNotifications = {}
-
--- The minimum space between notifications
-local minSpacing = 0.06
+local notificationHeight = 0.16  -- Set the height for each notification (you can adjust this based on your preference)
+local padding = 10  -- Padding for text
 
 -- Function to create a notification with a custom display time
 function NotificationLibrary:createNotification(text, displayTime)
@@ -69,9 +68,6 @@ function NotificationLibrary:createNotification(text, displayTime)
     textOutline.TextStrokeColor3 = Color3.fromRGB(0, 0, 0) -- Black outline
     textOutline.Parent = notification
 
-    -- Set the padding for the text
-    local padding = 10
-
     -- Adjust the size of the notification based on text bounds
     textLabel.Text = text  -- Set the text to make sure TextBounds is updated
     local textWidth = textLabel.TextBounds.X + padding * 2 -- Add padding to width
@@ -97,22 +93,15 @@ function NotificationLibrary:createNotification(text, displayTime)
         Enum.EasingDirection.Out -- Easing direction
     )
 
-    -- Determine the Y position for the new notification
-    local yPos = 0.12 + (#activeNotifications * minSpacing)
-
-    -- Check for overlap and adjust position if needed
-    for _, notif in ipairs(activeNotifications) do
-        local notifPos = notif.Position.Y.Offset
-        if notifPos + notif.Size.Y.Offset > yPos then
-            yPos = notifPos + notif.Size.Y.Offset + minSpacing
-        end
-    end
+    -- Calculate the starting position based on existing notifications
+    local positionOffset = 0.12 + (#activeNotifications * notificationHeight)
+    local newPosition = UDim2.new(0.02, 0, positionOffset, 0)
 
     -- Slide in from the top-left and move further down (adjusted position)
     local tweenIn = tweenService:Create(
         notification,
         tweenInfo,
-        { Position = UDim2.new(0.02, 0, yPos, 0) }
+        { Position = newPosition } -- Move a bit further down
     )
 
     -- Add the new notification to the activeNotifications table
@@ -144,7 +133,7 @@ function NotificationLibrary:createNotification(text, displayTime)
 
         -- Move up all notifications below the removed one
         for i, notif in ipairs(activeNotifications) do
-            local newPosition = UDim2.new(0.02, 0, 0.12 + ((i - 1) * minSpacing), 0) -- Adjust Y position based on index
+            local newPosition = UDim2.new(0.02, 0, 0.12 + ((i - 1) * notificationHeight), 0) -- Adjust Y position based on index
             tweenService:Create(notif, tweenInfo, { Position = newPosition }):Play()
         end
 
