@@ -142,5 +142,14 @@ function NotificationLibrary:createNotification(text, displayTime)
     end)
 end
 
+-- Detect player joining or leaving
+game.Players.PlayerAdded:Connect(function(player)
+    NotificationLibrary:createNotification(player.Name .. " joined!", 3)  -- Show notification for 3 seconds
+end)
+
+game.Players.PlayerRemoving:Connect(function(player)
+    NotificationLibrary:createNotification(player.Name .. " left!", 3)  -- Show notification for 3 seconds
+end)
+
 -- Return the NotificationLibrary table for use in other scripts
 return NotificationLibrary
